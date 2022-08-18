@@ -1,6 +1,6 @@
 // let brushStrokes
 // let numPoints = 20;
-let MIDI_MODE = false
+let MIDI_MODE = true
 
 //Fonts
 let dudler, emeritus;
@@ -98,7 +98,7 @@ function setup() {
 	// }
 
 	for (let i=0; i < notes.length; i++) {
-		floorTiles.push(new FloorTile(400 + ((width - 800)/notes.length * i), height / 2, ((width-800)/notes.length - 40), ((width-800)/notes.length - 40), notes[i], reverb))
+		floorTiles.push(new FloorTile(400 + ((width - 800)/notes.length * i), height / 2, ((width-800)/notes.length - 40), ((width-800)/notes.length - 40), notes[i], i+1))
 	}
 
 	// exciter_history = new ExciterBuffer(120)
@@ -179,16 +179,14 @@ function draw() {
 	}
 
 	// Floor tiles
-	for (let floorTile in floorTiles) {
-		floorTiles[floorTile].show()
+	for (let floorTile of floorTiles) {
+		floorTile.show()
 	}
 
 	// Check for intersections
-	for (let exciter in exciters) {
-		for (let floorTile in floorTiles) {
-			floorTiles[floorTile].intersects(exciters[exciter])
+	for (let floorTile in floorTiles) {
+			floorTiles[floorTile].intersects(exciters)
 		}
-	}
 
 	// Check for hold
 	if (mouseIsPressed) {
@@ -212,8 +210,8 @@ function draw() {
 	}
 
 
-	if (frameCount % 3 == 0) {
-		for (let i = 0; i < 10; i++) {
+	if (frameCount % 5 == 0) {
+		for (let i = 0; i < 5 * (1 + Math.sin(frameCount/60)); i++) {
 			exciters.push(new Exciter(mouseX, mouseY, excLifetime))
 		}
 	}
@@ -428,13 +426,16 @@ class ExciterBuffer {
 }
 
 class FloorTile {
-	constructor(x, y, w, h, note, reverb) {
+	constructor(x, y, w, h, note, ch) {
 		this.pos = createVector(x, y)
 		this.width = w
 		this.height = h
 		this.fillVal = 200
 		this.note = note
+		this.prevHit = false
 		this.hit = false
+		this.channel = ch
+		console.log(this.channel)
 
 		if (!MIDI_MODE) {
 			this.env = new p5.Envelope()
@@ -464,7 +465,10 @@ class FloorTile {
 
 			if (MIDI_MODE) {
 				if (midiOut) {
-					midiOut.channels[1].playNote(this.note.val, {duration: 100, attack: velocity});
+					// midiOut.channels[1].playNote(this.note.val, {duration: 100, attack: velocity});
+					if (!this.prevHit)
+						midiOut.channels[this.channel].sendNoteOn(this.note.val, {attack: velocity});
+						this.prevHit = true
 				}
 			} else {
 				this.env.setADSR(0.2 * max(0, 0.9-velocity), 0.0, 0.1, 0.5) // GRADUAL ATTACK SLOWDOWN
@@ -475,18 +479,30 @@ class FloorTile {
 		}
 	}
 
-	intersects(other) {
-		this.hit = collideRectCircle(this.pos.x, this.pos.y, this.width, this.height, other.pos.x, other.pos.y, 10)
+	offHit() {
+		if (midiOut && this.prevHit)
+			midiOut.channels[this.channel].sendNoteOff(this.note.val);
+			this.prevHit = false
+	}
+
+	intersects(exciters) {
+		this.hit = false
+		for (let exciter of exciters) {
+			let collision = collideRectCircle(this.pos.x, this.pos.y, this.width, this.height, exciter.pos.x, exciter.pos.y, 10)
+			this.hit = this.hit || collision
+		}
 		// if ((this.pos.y <= other.pos.y + 10) && (this.pos.x <= other.pos.x) && (this.pos.x + this.width >= other.pos.x)) {
 		// 	this.hit = true
 		// } else {
 		// 	this.hit = false
 		// }
 
-		if (this.hit == true) {
+		if (this.hit) {
 			// console.log(this.note)
-			this.onHit(other)
-		} 
+			this.onHit(exciters[exciters.length-1])
+		} else {
+			this.offHit()
+		}
 	}
 
 	show() {
@@ -502,7 +518,8 @@ class FloorTile {
 		fill(255 - this.fillVal)
 		textSize(16)
 		textFont((dudler))
-		text(this.note.noteName, this.pos.x + 10, this.pos.y + 26)
+		// text(this.note.noteName, this.pos.x + 10, this.pos.y + 26)
+		text('o', this.pos.x + 10, this.pos.y + 26)
 	}
 
 }
@@ -534,4 +551,5 @@ function onMidiEnabled() {
   WebMidi.outputs.forEach(output => console.log(output.manufacturer, output.name));
 
   midiOut = WebMidi.getOutputByName("loopMIDI Port");
+  console.log(midiOut.channels)
 }
