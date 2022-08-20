@@ -100,7 +100,7 @@ function setup() {
 
 	let N = 20
 	for (let i=0; i < N; i++) {
-		floorTiles.push(new FloorTile(400 + ((width - 800)/N * i), height / 3, random(0.1, 1.0) * ((width - 800)/N-50), 300, notes[i], i+1))
+		floorTiles.push(new FloorTile(400 + ((width - 800)/N * i), height / 3, random(0.1, 1.0) * ((width - 800)/N-50), 300, notes[i%4], i%4+1))
 	}
 
 	// exciter_history = new ExciterBuffer(120)
@@ -272,6 +272,12 @@ function mousePressed() {
 	mousePressedDuration = 0
 }
 
+function windowResized() {
+	resizeCanvas(windowWidth, windowHeight);
+	for (const floorTile in floorTiles) {
+		floorTiles[floorTile].updateOnResize()
+	}
+  }
 
 class Exciter {
 	constructor(x, y, lifetime) {
@@ -401,7 +407,7 @@ class ExciterBuffer {
 	plusplus(val) {
 		return (val + 1) % this.buffer.length
 	}
-
+	
     show(trailLength=null) { // TODO: finish implementing this
 	    // // if (!trailLength) {
 	    // // 	trailLength = this.buffer.length / 4
@@ -470,6 +476,8 @@ class FloorTile {
 				if (midiOut) {
 					// midiOut.channels[1].playNote(this.note.val, {duration: 100, attack: velocity});
 					if (!this.prevHit)
+						console.log(midiOut.channels)
+						console.log(this.channel)
 						midiOut.channels[this.channel].sendNoteOn(this.note.val, {attack: velocity});
 						this.prevHit = true
 				}
@@ -506,6 +514,10 @@ class FloorTile {
 		} else {
 			this.offHit()
 		}
+	}
+
+	updateOnResize() {
+		// TODO
 	}
 
 	show() {
@@ -555,5 +567,5 @@ function onMidiEnabled() {
 
 //   midiOut = WebMidi.getOutputByName("loopMIDI Port");
   midiOut = WebMidi.getOutputByName("loopMIDI Port");
-  console.log(midiOut.channels)
+//   console.log(midiOut.channels)
 }
