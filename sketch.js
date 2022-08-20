@@ -9,7 +9,7 @@ let points = []
 let exciters = []
 let floorTiles = []
 let trailLifetime = 400
-let excLifetime = 100
+let excLifetime = 20
 // let notes = {'D': 120, 'E': 120, 'F': 120, 'G': 120, 'A': 120, 'A#': 120, 'C'}
 
 let oscillators = []
@@ -22,6 +22,7 @@ let hold = false
 
 let clickX, clickY;
 let mousePressedDuration = 0;
+let reverb;
 
 let notes = [
 	// {
@@ -97,8 +98,9 @@ function setup() {
 	// 	console.log(point)
 	// }
 
-	for (let i=0; i < notes.length; i++) {
-		floorTiles.push(new FloorTile(400 + ((width - 800)/notes.length * i), height / 2, ((width-800)/notes.length - 40), ((width-800)/notes.length - 40), notes[i], i+1))
+	let N = 20
+	for (let i=0; i < N; i++) {
+		floorTiles.push(new FloorTile(400 + ((width - 800)/N * i), height / 3, random(0.1, 1.0) * ((width - 800)/N-50), 300, notes[i], i+1))
 	}
 
 	// exciter_history = new ExciterBuffer(120)
@@ -110,7 +112,7 @@ function draw() {
 	fill(255)
 	textSize(48)
 	textFont(emeritus)
-	text('Waterfall', width - 250, 55)
+	// text('Waterfall', width - 250, 55)
 
 	// brushStrokes.forEach(brushStroke => {
 	// 	brushStroke.draw()
@@ -149,7 +151,7 @@ function draw() {
 			exciter.applyForce(gravity)
 			exciter.update()
 			exciter.edges()
-			exciter.show()	
+			// exciter.show()	
 		}
 
 		for (let i = exciters.length-1; i >=0; i--) {
@@ -170,8 +172,8 @@ function draw() {
 		// Draw current exciters
 		// exciters = exciter_history.get()
 		for (let exciter of exciters) {
-			exciter.show(true)	
-			exciter.history.show()
+			// exciter.show(true)	
+			// exciter.history.show()
 			exciter.history.incrementTimestep()
 		}
 		// Increment loop timestep
@@ -447,7 +449,8 @@ class FloorTile {
 			this.osc.amp(this.env, 0)
 			oscillators.push(this.osc)
 
-			reverb.process(this.osc)
+			if (reverb)
+				reverb.process(this.osc)
 		}
 
 		this.playing = false
@@ -515,11 +518,11 @@ class FloorTile {
 		this.fillVal *= 0.8
 		noStroke()
 		rect(this.pos.x, this.pos.y, this.width, this.height)
-		fill(255 - this.fillVal)
-		textSize(16)
-		textFont((dudler))
+		// fill(255 - this.fillVal)
+		// textSize(16)
+		// textFont((dudler))
 		// text(this.note.noteName, this.pos.x + 10, this.pos.y + 26)
-		text('o', this.pos.x + 10, this.pos.y + 26)
+		// text('o', this.pos.x + 10, this.pos.y + 26)
 	}
 
 }
@@ -550,6 +553,7 @@ function onMidiEnabled() {
   console.log("Outputs:") 
   WebMidi.outputs.forEach(output => console.log(output.manufacturer, output.name));
 
+//   midiOut = WebMidi.getOutputByName("loopMIDI Port");
   midiOut = WebMidi.getOutputByName("loopMIDI Port");
   console.log(midiOut.channels)
 }
