@@ -202,14 +202,14 @@ function draw() {
 		}
 	}  
 
-	if (hold) {
-		fill(255)
-		ellipse(mouseX, mouseY, 60, 60)
-		fill(0)
-		textSize(20)
-		textFont((dudler))
-		text("loop", mouseX-19, mouseY+7)
-	}
+	// if (hold) {
+	// 	fill(255)
+	// 	ellipse(mouseX, mouseY, 60, 60)
+	// 	fill(0)
+	// 	textSize(20)
+	// 	textFont((dudler))
+	// 	text("loop", mouseX-19, mouseY+7)
+	// }
 
 
 	if (frameCount % 5 == 0) {
@@ -217,6 +217,15 @@ function draw() {
 			exciters.push(new Exciter(mouseX, mouseY, excLifetime))
 		}
 	}
+
+	// // draw vertical line at mouseX
+	// stroke(255);
+	// strokeWeight(0.3);
+	// line(mouseX, 0, mouseX, windowHeight);
+
+	// for (tile of floorTiles) {
+	// 	tile.height = 120 * (1.2 + Math.sin(millis()/1000))
+	// }
 }
 
 function mouseClicked() {
@@ -239,16 +248,16 @@ function mouseClicked() {
 function mouseDragged() {
 	// brushStrokes.push(new BrushStroke(mouseX, mouseY))
 
-	if (!hold) {
+	// if (!hold) {
 		trailLifetime = 400
 
 		if (mouseX < windowWidth && mouseY < windowHeight) {
-			let point = createVector(mouseX, mouseY)
-			points.push(point)
+			// let point = createVector(mouseX, mouseY)
+			// points.push(point)
 
-			if (mouseX % 2 == 0) {
+			// if (mouseX % 2 == 0) {
 				exciters.push(new Exciter(mouseX, mouseY, excLifetime))
-			}
+			// }
 		}
 
 		// Causes exciters to fall in a cool, circular pattern
@@ -259,7 +268,7 @@ function mouseDragged() {
 		// }
 
 		// console.log(points.length, exciters.length)
-	}
+	// }
 }
 
 function mousePressed() {
