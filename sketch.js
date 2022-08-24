@@ -70,7 +70,7 @@ let notes = [
 function preload() {
 	dudler = loadFont('assets/Dudler-Regular.woff');
 	emeritus = loadFont('assets/Emeritus-Display.woff');
-  }
+}
 
 function setup() {
 	let cnv = createCanvas(windowWidth, windowHeight)
@@ -80,7 +80,7 @@ function setup() {
 		WebMidi
 			.enable()
 			.then(onMidiEnabled)
- 		 	.catch(err => alert(err));
+			.catch(err => alert(err));
 	} else {
 		reverb = new p5.Reverb()
 	}
@@ -88,7 +88,7 @@ function setup() {
 	// for (let i = 0; i < 100; i++) {
 	// 	exciters.push(new Exciter(width/2, height/2))
 	// }
-	
+
 	// brushStrokes = []
 
 	// for (let i = 0; i < numPoints; i++) {
@@ -98,9 +98,11 @@ function setup() {
 	// 	console.log(point)
 	// }
 
-	let N = 20
-	for (let i=0; i < N; i++) {
-		floorTiles.push(new FloorTile(400 + ((width - 800)/N * i), height / 3, random(0.1, 1.0) * ((width - 800)/N-50), 300, notes[i%4], i%4+1))
+	let N = 30
+	let padding = 300
+	let tileHeight = 300
+	for (let i = 0; i < N; i++) {
+		floorTiles.push(new FloorTile(padding + ((width - 2 * padding) / N * i), (height - tileHeight) / 2, random(0.1, 1.0) * ((width - 2 * padding) / N - 50), tileHeight, notes[i % 4], i % 4 + 1))
 	}
 
 	// exciter_history = new ExciterBuffer(120)
@@ -138,7 +140,7 @@ function draw() {
 	strokeJoin(ROUND)
 	noFill()
 	beginShape()
-	for (let i=0; i<points.length; i++) {
+	for (let i = 0; i < points.length; i++) {
 		let pt = points[i]
 		curveVertex(pt.x, pt.y)
 	}
@@ -154,7 +156,7 @@ function draw() {
 			// exciter.show()	
 		}
 
-		for (let i = exciters.length-1; i >=0; i--) {
+		for (let i = exciters.length - 1; i >= 0; i--) {
 			if (exciters[i].finished()) {
 				exciters.splice(i, 1)
 			}
@@ -187,8 +189,8 @@ function draw() {
 
 	// Check for intersections
 	for (let floorTile in floorTiles) {
-			floorTiles[floorTile].intersects(exciters)
-		}
+		floorTiles[floorTile].intersects(exciters)
+	}
 
 	// Check for hold
 	if (mouseIsPressed) {
@@ -200,7 +202,7 @@ function draw() {
 		if (mousePressedDuration > 20) {
 			hold = true
 		}
-	}  
+	}
 
 	// if (hold) {
 	// 	fill(255)
@@ -213,7 +215,7 @@ function draw() {
 
 
 	if (frameCount % 5 == 0) {
-		for (let i = 0; i < 5 * (1 + Math.sin(frameCount/60)); i++) {
+		for (let i = 0; i < 5 * (1 + Math.sin(frameCount / 60)); i++) {
 			exciters.push(new Exciter(mouseX, mouseY, excLifetime))
 		}
 	}
@@ -226,6 +228,30 @@ function draw() {
 	// for (tile of floorTiles) {
 	// 	tile.height = 120 * (1.2 + Math.sin(millis()/1000))
 	// }
+	if (keyIsDown(UP_ARROW)) {
+		for (tile of floorTiles) {
+			tile.pos.y -= 1
+			tile.height += 2
+		}
+	}
+	if (keyIsDown(DOWN_ARROW)) {
+		for (tile of floorTiles) {
+			tile.pos.y += 1
+			tile.height -= 2
+		}
+	}
+	if (keyIsDown(RIGHT_ARROW)) {
+		for (tile of floorTiles) {
+			tile.pos.x -= 1
+			tile.width += 2
+		}
+	}
+	if (keyIsDown(LEFT_ARROW)) {
+		for (tile of floorTiles) {
+			tile.pos.x += 1
+			tile.width -= 2
+		}
+	}
 }
 
 function mouseClicked() {
@@ -249,25 +275,25 @@ function mouseDragged() {
 	// brushStrokes.push(new BrushStroke(mouseX, mouseY))
 
 	// if (!hold) {
-		trailLifetime = 400
+	trailLifetime = 400
 
-		if (mouseX < windowWidth && mouseY < windowHeight) {
-			// let point = createVector(mouseX, mouseY)
-			// points.push(point)
+	if (mouseX < windowWidth && mouseY < windowHeight) {
+		// let point = createVector(mouseX, mouseY)
+		// points.push(point)
 
-			// if (mouseX % 2 == 0) {
-				exciters.push(new Exciter(mouseX, mouseY, excLifetime))
-			// }
-		}
-
-		// Causes exciters to fall in a cool, circular pattern
-		// for (const point in points) {
-		// 	if (mouseX % 10 == 0) {	
-		// 		exciters.push(new Exciter(mouseX, mouseY, excLifetime))
-		// 	}
+		// if (mouseX % 2 == 0) {
+		exciters.push(new Exciter(mouseX, mouseY, excLifetime))
 		// }
+	}
 
-		// console.log(points.length, exciters.length)
+	// Causes exciters to fall in a cool, circular pattern
+	// for (const point in points) {
+	// 	if (mouseX % 10 == 0) {	
+	// 		exciters.push(new Exciter(mouseX, mouseY, excLifetime))
+	// 	}
+	// }
+
+	// console.log(points.length, exciters.length)
 	// }
 }
 
@@ -286,7 +312,7 @@ function windowResized() {
 	for (const floorTile in floorTiles) {
 		floorTiles[floorTile].updateOnResize()
 	}
-  }
+}
 
 class Exciter {
 	constructor(x, y, lifetime) {
@@ -321,7 +347,7 @@ class Exciter {
 
 		if (this.pos.x < 0 || this.pos.x > width) {
 			this.vel.x *= -0.93
-		} 
+		}
 
 		// console.log(this.pos.y);
 	}
@@ -333,13 +359,13 @@ class Exciter {
 
 		this.vel.add(this.acc)
 		// this.vel.limit(20)
-	
+
 		this.pos.add(this.vel)
 
 		this.lifetime -= 1
 	}
 
-	show(held=false) {
+	show(held = false) {
 		// fill(255)
 		if (held) {
 			// stroke(255, 0.5 * this.lifetime);
@@ -373,20 +399,20 @@ class Exciter {
 }
 
 class ExciterBuffer {
-    constructor(length) {
-        this.pointer = 0 // last item added
+	constructor(length) {
+		this.pointer = 0 // last item added
 		this.read_pointer = 0 // item to read
-        this.buffer = []
+		this.buffer = []
 		this.length = length
-    }
+	}
 
-    get() {
+	get() {
 		return this.buffer[this.read_pointer] || [];
 	}
 
-    pushClone(exciters) {
-        let excitersCloned = []
-        for (let exciter of exciters) {
+	pushClone(exciters) {
+		let excitersCloned = []
+		for (let exciter of exciters) {
 			let exciter_copy = {}
 			exciter_copy.pos = exciter.pos.copy()
 			exciter_copy.vel = exciter.vel.copy()
@@ -397,30 +423,30 @@ class ExciterBuffer {
 			exciter_copy.applyForce = exciter.applyForce
 			exciter_copy.edges = exciter.edges
 			exciter_copy.update = exciter.update
-            excitersCloned.push(exciter_copy)
-        }
+			excitersCloned.push(exciter_copy)
+		}
 		this.push(excitersCloned)
-    }
+	}
 
-    push(item){
+	push(item) {
 		this.pointer = this.read_pointer
-      	this.buffer[this.pointer] = item;
-      	this.pointer = (this.pointer + 1) % this.length;
+		this.buffer[this.pointer] = item;
+		this.pointer = (this.pointer + 1) % this.length;
 		this.read_pointer = this.pointer
-    }
+	}
 
 	incrementTimestep() {
-      	this.read_pointer = (this.read_pointer + 1) % this.buffer.length;
+		this.read_pointer = (this.read_pointer + 1) % this.buffer.length;
 	}
 
 	plusplus(val) {
 		return (val + 1) % this.buffer.length
 	}
-	
-    show(trailLength=null) { // TODO: finish implementing this
-	    // // if (!trailLength) {
-	    // // 	trailLength = this.buffer.length / 4
-	    // // }
+
+	show(trailLength = null) { // TODO: finish implementing this
+		// // if (!trailLength) {
+		// // 	trailLength = this.buffer.length / 4
+		// // }
 		// //  	return this.buffer.slice((this.pointer - trailLength) % length, this.pointer)
 		// noFill();
 		// // for(let exciter_frame of this.buffer) {
@@ -439,7 +465,7 @@ class ExciterBuffer {
 			curveVertex(this.buffer[i].pos.x, this.buffer[i].pos.y);
 		}
 		endShape();
-    }
+	}
 }
 
 class FloorTile {
@@ -456,7 +482,7 @@ class FloorTile {
 
 		if (!MIDI_MODE) {
 			this.env = new p5.Envelope()
-		
+
 			this.osc = new p5.Oscillator()
 			this.osc.setType('triangle')
 			// this.osc.start()
@@ -472,12 +498,12 @@ class FloorTile {
 	}
 
 	onHit(other) {
-		let velocity = (other.lifetime / excLifetime)**3 // velocity is between 0 and 1
+		let velocity = (other.lifetime / excLifetime) ** 3 // velocity is between 0 and 1
 
 		this.fillVal = 255 * min(1, sqrt(velocity * 5))
 
 		// console.log(velocity)
-		
+
 		if (Math.abs(other.vel.y) > 2) {
 			// this.env.setADSR(random(0, 0.2), 0.0, 0.1, 0.5) // RANDOM ATTACK
 
@@ -486,12 +512,12 @@ class FloorTile {
 					// midiOut.channels[1].playNote(this.note.val, {duration: 100, attack: velocity});
 					if (!this.prevHit)
 						console.log(midiOut.channels)
-						console.log(this.channel)
-						midiOut.channels[this.channel].sendNoteOn(this.note.val, {attack: velocity});
-						this.prevHit = true
+					console.log(this.channel)
+					midiOut.channels[this.channel].sendNoteOn(this.note.val, { attack: velocity });
+					this.prevHit = true
 				}
 			} else {
-				this.env.setADSR(0.2 * max(0, 0.9-velocity), 0.0, 0.1, 0.5) // GRADUAL ATTACK SLOWDOWN
+				this.env.setADSR(0.2 * max(0, 0.9 - velocity), 0.0, 0.1, 0.5) // GRADUAL ATTACK SLOWDOWN
 				this.env.setRange(velocity, 0)
 				// this.env.setRange(0.1, 0)
 				this.env.play()
@@ -502,7 +528,7 @@ class FloorTile {
 	offHit() {
 		if (midiOut && this.prevHit)
 			midiOut.channels[this.channel].sendNoteOff(this.note.val);
-			this.prevHit = false
+		this.prevHit = false
 	}
 
 	intersects(exciters) {
@@ -519,7 +545,7 @@ class FloorTile {
 
 		if (this.hit) {
 			// console.log(this.note)
-			this.onHit(exciters[exciters.length-1])
+			this.onHit(exciters[exciters.length - 1])
 		} else {
 			this.offHit()
 		}
@@ -535,7 +561,7 @@ class FloorTile {
 		// } else {
 		// 	console.log('Nothing is hit')
 		// }
-		fill(this.fillVal) //, 10, 100)
+		fill(255, this.fillVal) //, 10, 100)
 		this.fillVal *= 0.8
 		noStroke()
 		rect(this.pos.x, this.pos.y, this.width, this.height)
@@ -564,17 +590,17 @@ class FloorTile {
 // }
 
 function onMidiEnabled() {
-  console.log("WebMidi enabled!") 
+	console.log("WebMidi enabled!")
 
-  // Inputs
-  console.log("Inputs:") 
-  WebMidi.inputs.forEach(input => console.log(input.manufacturer, input.name));
-  
-  // Outputs
-  console.log("Outputs:") 
-  WebMidi.outputs.forEach(output => console.log(output.manufacturer, output.name));
+	// Inputs
+	console.log("Inputs:")
+	WebMidi.inputs.forEach(input => console.log(input.manufacturer, input.name));
 
-//   midiOut = WebMidi.getOutputByName("loopMIDI Port");
-  midiOut = WebMidi.getOutputByName("loopMIDI Port");
-//   console.log(midiOut.channels)
+	// Outputs
+	console.log("Outputs:")
+	WebMidi.outputs.forEach(output => console.log(output.manufacturer, output.name));
+
+	//   midiOut = WebMidi.getOutputByName("loopMIDI Port");
+	midiOut = WebMidi.getOutputByName("loopMIDI Port");
+	//   console.log(midiOut.channels)
 }
